@@ -13,11 +13,18 @@
                     <li class="nav-item">
                         <router-link class="nav-link" to="/history">History</router-link>
                     </li>
+                </ul>
+                <ul class="navbar-nav" v-if="!$store.state.user.is_login">
                     <li class="nav-item">
-                        <router-link class="nav-link" to="/history">Login</router-link>
+                        <router-link class="nav-link" to="/login">Login</router-link>
                     </li>
                     <li class="nav-item">
-                        <router-link class="nav-link" to="/history">Register</router-link>
+                        <router-link class="nav-link" to="/register">Register</router-link>
+                    </li>
+                </ul>
+                <ul class="navbar-nav" v-if="$store.state.user.is_login">
+                    <li class="nav-item">
+                        <a class="nav-link" href="#" @click="logout">Logout</a>
                     </li>
                 </ul>
             </div>
@@ -25,10 +32,31 @@
     </nav>
 
 </template>
-
 <script>
+import {useStore} from "vuex";
 export default {
-    name: "NavBar"
+    name: "NavBar",
+    setup() {
+        const store = useStore();
+        let jwt_token = localStorage.getItem("jwt_token");
+        if(jwt_token){
+            store.commit("updateStatus",true);
+            store.commit("updateToken",jwt_token);
+            store.dispatch("getInfo",{
+                success(){},
+                error(resp){
+                    console.log(resp)
+                },
+            })
+        }
+        const logout = () => {
+            store.dispatch("logout");
+        }
+
+        return {
+            logout,
+        }
+    }
 }
 </script>
 
